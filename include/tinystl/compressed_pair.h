@@ -8,12 +8,13 @@ namespace tinystl {
 
 namespace compressed_pair_detail {
 
-template <class T, int Place,
+template <class T,
+          int  Place,
           bool IsEmptyBase =
               std::is_empty<T>::value && !std::is_final<T>::value>
 class compressed_pair_element {
 public:
-  using reference = T &;
+  using reference       = T &;
   using const_reference = const T &;
 
   template <class... Args>
@@ -21,7 +22,7 @@ public:
       std::is_nothrow_constructible<T, decltype(args)...>::value)
       : value(std::forward<Args>(args)...) {}
 
-  reference get() noexcept { return value; }
+  reference       get() noexcept { return value; }
   const_reference get() const noexcept { return value; }
 
 private:
@@ -31,7 +32,7 @@ private:
 template <class T, int Place>
 class compressed_pair_element<T, Place, true> : private T {
 public:
-  using reference = T &;
+  using reference       = T &;
   using const_reference = const T &;
 
   template <class... Args>
@@ -39,13 +40,14 @@ public:
       std::is_nothrow_constructible<T, decltype(args)...>::value)
       : T(std::forward<Args>(args)...) {}
 
-  reference get() noexcept { return *this; }
+  reference       get() noexcept { return *this; }
   const_reference get() const noexcept { return *this; }
 };
 
 } // namespace compressed_pair_detail
 
-template <class T1, class T2,
+template <class T1,
+          class T2,
           bool = std::is_default_constructible<T1>::value
               &&std::is_default_constructible<T2>::value>
 class compressed_pair
@@ -56,23 +58,25 @@ class compressed_pair
 
 public:
   template <class U1, class U2>
-  constexpr compressed_pair(U1 &&value1, U2 &&value2)
+  constexpr compressed_pair(U1 &&value1, U2 &&value2) noexcept(
+      std::is_nothrow_constructible<U1, decltype(value1)>::value
+          &&std::is_nothrow_constructible<U2, decltype(value2)>::value)
       : Base1(std::forward<U1>(value1)), Base2(std::forward<U2>(value2)) {}
 
   auto first() noexcept -> typename Base1::reference {
-    return static_cast<Base1>(*this).get();
+    return static_cast<Base1 *>(this)->get();
   }
 
   auto first() const noexcept -> typename Base1::const_reference {
-    return static_cast<Base1>(*this).get();
+    return static_cast<const Base1 *>(this)->get();
   }
 
   auto second() noexcept -> typename Base2::reference {
-    return static_cast<Base2>(*this).get();
+    return static_cast<Base2 *>(this)->get();
   }
 
   auto second() const noexcept -> typename Base2::const_reference {
-    return static_cast<Base2>(*this).get();
+    return static_cast<const Base2 *>(this)->get();
   }
 
   void swap(compressed_pair &other) {
@@ -96,7 +100,9 @@ public:
       : Base1(), Base2() {}
 
   template <class U1, class U2>
-  constexpr compressed_pair(U1 &&value1, U2 &&value2)
+  constexpr compressed_pair(U1 &&value1, U2 &&value2) noexcept(
+      std::is_nothrow_constructible<U1, decltype(value1)>::value
+          &&std::is_nothrow_constructible<U2, decltype(value2)>::value)
       : Base1(std::forward<U1>(value1)), Base2(std::forward<U2>(value2)) {}
 
   auto first() noexcept -> typename Base1::reference {
@@ -104,7 +110,7 @@ public:
   }
 
   auto first() const noexcept -> typename Base1::const_reference {
-    return static_cast<Base1 *>(this)->get();
+    return static_cast<const Base1 *>(this)->get();
   }
 
   auto second() noexcept -> typename Base2::reference {
@@ -112,7 +118,7 @@ public:
   }
 
   auto second() const noexcept -> typename Base2::const_reference {
-    return static_cast<Base2 *>(this)->get();
+    return static_cast<const Base2 *>(this)->get();
   }
 
   void swap(compressed_pair &other) {
