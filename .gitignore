@@ -1,0 +1,12 @@
+# macOS system file
+.DS_Store
+
+# vscode
+.cache/
+.vscode/
+
+# clangd
+compile_commands.json
+
+# binary dir
+build/
