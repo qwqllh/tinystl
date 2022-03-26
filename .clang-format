@@ -1,2 +1,8 @@
 BasedOnStyle: LLVM
 IndentPPDirectives: AfterHash
+BinPackParameters: false
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortFunctionsOnASingleLine: true
+PointerAlignment: Right
