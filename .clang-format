@@ -6,3 +6,5 @@ AlignConsecutiveDeclarations: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 AllowShortFunctionsOnASingleLine: true
 PointerAlignment: Right
+ColumnLimit: 100
+AlwaysBreakTemplateDeclarations: true

@@ -20,7 +20,7 @@
 #ifndef TINYSTL_AVL_TREE_H
 #define TINYSTL_AVL_TREE_H
 
-#include "compressed_pair.h"
+#include <tinystl/compressed_pair.h>
 
 #include <algorithm>
 #include <cassert>
@@ -31,7 +31,8 @@
 
 namespace tinystl {
 
-template <class T, class Compare> class avl_tree;
+template <class T, class Compare>
+class avl_tree;
 
 class avl_node {
 public:
@@ -54,7 +55,8 @@ public:
   const_pointer next() const noexcept;
   const_pointer prev() const noexcept;
 
-  template <class T, class Compare> friend class avl_tree;
+  template <class T, class Compare>
+  friend class avl_tree;
 
 protected:
   // avl_node is NOT a virtual class.
@@ -69,28 +71,20 @@ private:
   }
 
   template <class Impl, class Compare>
-  void replace_as_child(pointer                  node,
-                        pointer                  parent,
-                        avl_tree<Impl, Compare> &tree) noexcept;
+  void replace_as_child(pointer node, pointer parent, avl_tree<Impl, Compare> &tree) noexcept;
 
   template <class Impl, class Compare>
   void replace(pointer node, avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   pointer rotate_left(avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   pointer rotate_right(avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   pointer fix_left(avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   pointer fix_right(avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   void rebalance(avl_tree<Impl, Compare> &tree) noexcept;
-
   template <class Impl, class Compare>
   void fix_insert(avl_tree<Impl, Compare> &tree) noexcept;
 
@@ -101,7 +95,8 @@ private:
   size_type mHeight = 0;
 };
 
-template <class T, class Compare> class avl_tree_iterator {
+template <class T, class Compare>
+class avl_tree_iterator {
 public:
   using value_type        = T;
   using reference         = value_type &;
@@ -152,14 +147,10 @@ public:
   }
 
   reference       operator*() noexcept { return *static_cast<pointer>(mPtr); }
-  const_reference operator*() const noexcept {
-    return *static_cast<const_pointer>(mPtr);
-  }
+  const_reference operator*() const noexcept { return *static_cast<const_pointer>(mPtr); }
 
   reference       operator->() noexcept { return *static_cast<pointer>(mPtr); }
-  const_reference operator->() const noexcept {
-    return *static_cast<const_pointer>(mPtr);
-  }
+  const_reference operator->() const noexcept { return *static_cast<const_pointer>(mPtr); }
 
   constexpr bool operator==(const avl_tree_iterator rhs) const noexcept {
     return (mTree == rhs.mTree && mPtr == rhs.mPtr);
@@ -178,7 +169,8 @@ private:
   avl_node             *mPtr  = nullptr;
 };
 
-template <class T, class Compare> class avl_tree_const_iterator {
+template <class T, class Compare>
+class avl_tree_const_iterator {
 public:
   using value_type        = const T;
   using reference         = const value_type &;
@@ -189,11 +181,10 @@ public:
   using iterator_category = std::bidirectional_iterator_tag;
 
   constexpr avl_tree_const_iterator(const avl_tree<T, Compare> *tree = nullptr,
-                                    const avl_node *node = nullptr) noexcept
+                                    const avl_node             *node = nullptr) noexcept
       : mTree(tree), mPtr(node) {}
 
-  constexpr avl_tree_const_iterator(const avl_tree_const_iterator &) noexcept =
-      default;
+  constexpr avl_tree_const_iterator(const avl_tree_const_iterator &) noexcept = default;
 
   avl_tree_const_iterator &operator++() noexcept {
     if (mPtr != nullptr) {
@@ -230,14 +221,10 @@ public:
   }
 
   reference       operator*() noexcept { return *static_cast<pointer>(mPtr); }
-  const_reference operator*() const noexcept {
-    return *static_cast<const_pointer>(mPtr);
-  }
+  const_reference operator*() const noexcept { return *static_cast<const_pointer>(mPtr); }
 
   reference       operator->() noexcept { return *static_cast<pointer>(mPtr); }
-  const_reference operator->() const noexcept {
-    return *static_cast<const_pointer>(mPtr);
-  }
+  const_reference operator->() const noexcept { return *static_cast<const_pointer>(mPtr); }
 
   constexpr bool operator==(const avl_tree_const_iterator rhs) const noexcept {
     return (mTree == rhs.mTree && mPtr == rhs.mPtr);
@@ -247,9 +234,7 @@ public:
     return !((*this) == rhs);
   }
 
-  const_pointer get() const noexcept {
-    return static_cast<const_pointer>(mPtr);
-  }
+  const_pointer get() const noexcept { return static_cast<const_pointer>(mPtr); }
 
   friend class avl_tree<T, Compare>;
 
@@ -258,7 +243,8 @@ private:
   const avl_node             *mPtr  = nullptr;
 };
 
-template <class T, class Compare = std::less<T>> class avl_tree {
+template <class T, class Compare = std::less<T>>
+class avl_tree {
 public:
   using key_type        = T;
   using value_type      = T;
@@ -273,14 +259,12 @@ public:
   using iterator        = avl_tree_iterator<T, Compare>;
   using const_iterator  = avl_tree_const_iterator<T, Compare>;
 
-  static_assert(std::is_base_of<avl_node, T>::value,
-                "T should inhert from avl_node_meta.");
+  static_assert(std::is_base_of<avl_node, T>::value, "T should inhert from avl_node_meta.");
 
   avl_tree() noexcept(std::is_nothrow_default_constructible<Compare>::value)
       : mValue(nullptr, Compare()) {}
 
-  explicit avl_tree(const Compare &cmp) noexcept(
-      std::is_nothrow_copy_constructible<Compare>::value)
+  explicit avl_tree(const Compare &cmp) noexcept(std::is_nothrow_copy_constructible<Compare>::value)
       : mValue(nullptr, cmp) {}
 
   avl_tree(const avl_tree &other) = default;
@@ -291,9 +275,7 @@ public:
 
   pointer root() noexcept { return static_cast<pointer>(mValue.first()); }
 
-  const_pointer root() const noexcept {
-    return static_cast<const_pointer>(mValue.first());
-  }
+  const_pointer root() const noexcept { return static_cast<const_pointer>(mValue.first()); }
 
   iterator begin() noexcept;
   iterator end() noexcept;
@@ -328,7 +310,8 @@ public:
     erase(node.mPtr);
   }
 
-  template <class Func> void clear(Func &&handler);
+  template <class Func>
+  void clear(Func &&handler);
 
   pointer       find(const_reference value) noexcept;
   const_pointer find(const_reference value) const noexcept;
@@ -359,7 +342,8 @@ public:
   friend class avl_node;
 
 private:
-  template <class Func> void clear_impl(avl_node *node, Func &handler);
+  template <class Func>
+  void clear_impl(avl_node *node, Func &handler);
 
 private:
   size_type                            mSize = 0;
@@ -477,9 +461,7 @@ inline auto avl_node::prev() noexcept -> pointer {
 }
 
 template <class T, class Compare>
-void avl_node::replace_as_child(pointer               node,
-                                pointer               parent,
-                                avl_tree<T, Compare> &tree) noexcept {
+void avl_node::replace_as_child(pointer node, pointer parent, avl_tree<T, Compare> &tree) noexcept {
   if (parent != nullptr) {
     if (parent->left() == this)
       parent->mLeft = node;
@@ -715,8 +697,7 @@ bool avl_tree<T, Compare>::insert_unique(pointer obj) noexcept {
   }
 
   for (;;) {
-    if (value_comp()(*static_cast<pointer>(node),
-                     *static_cast<pointer>(current))) {
+    if (value_comp()(*static_cast<pointer>(node), *static_cast<pointer>(current))) {
       if (current->left() != nullptr) {
         current = current->left();
       } else {
@@ -726,8 +707,7 @@ bool avl_tree<T, Compare>::insert_unique(pointer obj) noexcept {
         mSize += 1;
         return true;
       }
-    } else if (value_comp()(*static_cast<pointer>(current),
-                            *static_cast<pointer>(node))) {
+    } else if (value_comp()(*static_cast<pointer>(current), *static_cast<pointer>(node))) {
       if (current->right() != nullptr) {
         current = current->right();
       } else {
@@ -756,8 +736,7 @@ auto avl_tree<T, Compare>::insert_or_replace(pointer obj) noexcept -> pointer {
   }
 
   for (;;) {
-    if (value_comp()(*static_cast<pointer>(current),
-                     *static_cast<pointer>(node))) {
+    if (value_comp()(*static_cast<pointer>(current), *static_cast<pointer>(node))) {
       if (current->left() != nullptr) {
         current = current->left();
       } else {
@@ -767,8 +746,7 @@ auto avl_tree<T, Compare>::insert_or_replace(pointer obj) noexcept -> pointer {
         mSize += 1;
         return nullptr;
       }
-    } else if (value_comp()(*static_cast<pointer>(node),
-                            *static_cast<pointer>(current))) {
+    } else if (value_comp()(*static_cast<pointer>(node), *static_cast<pointer>(current))) {
       if (current->right() != nullptr) {
         current = current->right();
       } else {
@@ -799,8 +777,7 @@ void avl_tree<T, Compare>::insert_multi(pointer obj) noexcept {
   }
 
   for (;;) {
-    if (value_comp()(*static_cast<pointer>(node),
-                     *static_cast<pointer>(current))) {
+    if (value_comp()(*static_cast<pointer>(node), *static_cast<pointer>(current))) {
       if (current->left() != nullptr) {
         current = current->left();
       } else {
@@ -810,8 +787,7 @@ void avl_tree<T, Compare>::insert_multi(pointer obj) noexcept {
         mSize += 1;
         return;
       }
-    } else if (value_comp()(*static_cast<pointer>(current),
-                            *static_cast<pointer>(node))) {
+    } else if (value_comp()(*static_cast<pointer>(current), *static_cast<pointer>(node))) {
       if (current->right() != nullptr) {
         current = current->right();
       } else {
@@ -938,8 +914,7 @@ auto avl_tree<T, Compare>::find(const_reference value) noexcept -> pointer {
 }
 
 template <class T, class Compare>
-auto avl_tree<T, Compare>::find(const_reference value) const noexcept
-    -> const_pointer {
+auto avl_tree<T, Compare>::find(const_reference value) const noexcept -> const_pointer {
   auto node = static_cast<const avl_node *>(root());
   while (node != nullptr) {
     if (value_comp()(value, *static_cast<const_pointer>(node))) {
@@ -972,8 +947,7 @@ auto avl_tree<T, Compare>::find(Fn &&fn, Value &&value) noexcept -> pointer {
 
 template <class T, class Compare>
 template <class Value, class Fn>
-auto avl_tree<T, Compare>::find(Fn &&fn, Value &&value) const noexcept
-    -> const_pointer {
+auto avl_tree<T, Compare>::find(Fn &&fn, Value &&value) const noexcept -> const_pointer {
   auto node = static_cast<const avl_node *>(root());
 
   while (node != nullptr) {

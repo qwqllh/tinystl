@@ -1,8 +1,8 @@
 #ifndef TINYSTL_SET_H
 #define TINYSTL_SET_H
 
-#include "avl_tree.h"
-#include "compressed_pair.h"
+#include <tinystl/avl_tree.h>
+#include <tinystl/compressed_pair.h>
 
 #include <memory>
 #include <set>
@@ -11,12 +11,12 @@
 
 namespace tinystl {
 
-template <class Key> struct set_node : public avl_node {
+template <class Key>
+struct set_node : public avl_node {
   Key mKey;
 
   template <class... Args>
-  set_node(Args &&...args) noexcept(
-      std::is_nothrow_constructible<Key, decltype(args)...>::value)
+  set_node(Args &&...args) noexcept(std::is_nothrow_constructible<Key, decltype(args)...>::value)
       : mKey(std::forward<Args>(args)...) {}
 };
 
@@ -41,9 +41,7 @@ private:
         std::is_nothrow_constructible<Compare, decltype(args)...>::value)
         : Compare(std::forward<Args>(args)...) {}
 
-    const Compare &decay() const noexcept {
-      return *static_cast<const Compare *>(this);
-    }
+    const Compare &decay() const noexcept { return *static_cast<const Compare *>(this); }
 
     bool operator()(const node_type &a, const node_type &b) {
       return static_cast<const Compare *>(this)->operator()(a.mKey, b.mKey);
@@ -51,7 +49,8 @@ private:
   };
 
   /// Specialize for final Compare class.
-  template <> struct internal_compare<true> {
+  template <>
+  struct internal_compare<true> {
     using type_flag = internal_compare_member_flag;
 
     Compare mCompare;
@@ -63,9 +62,7 @@ private:
 
     const Compare &decay() const noexcept { return mCompare; }
 
-    bool operator()(const node_type &a, const node_type &b) {
-      return mCompare(a.mKey, b.mKey);
-    }
+    bool operator()(const node_type &a, const node_type &b) { return mCompare(a.mKey, b.mKey); }
   };
 
   using internal_tree_type = avl_tree<node_type, internal_compare<>>;
@@ -117,22 +114,17 @@ private:
       return ret.mKey;
     }
 
-    constexpr bool operator==(const set_iterator rhs) const noexcept {
-      return it == rhs.it;
-    }
+    constexpr bool operator==(const set_iterator rhs) const noexcept { return it == rhs.it; }
 
-    constexpr bool operator!=(const set_iterator rhs) const noexcept {
-      return it != rhs.it;
-    }
+    constexpr bool operator!=(const set_iterator rhs) const noexcept { return it != rhs.it; }
 
-    template <class, class, class> friend class set;
+    template <class, class, class>
+    friend class set;
 
   private:
-    constexpr set_iterator(typename internal_tree_type::iterator i) noexcept
-        : it(i) {}
+    constexpr set_iterator(typename internal_tree_type::iterator i) noexcept : it(i) {}
 
-    constexpr set_iterator(internal_tree_type *tree, avl_node *node) noexcept
-        : it(tree, node) {}
+    constexpr set_iterator(internal_tree_type *tree, avl_node *node) noexcept : it(tree, node) {}
 
     typename internal_tree_type::iterator it;
   };
@@ -184,23 +176,17 @@ private:
       return ret.mKey;
     }
 
-    constexpr bool operator==(const set_const_iterator rhs) const noexcept {
-      return it == rhs.it;
-    }
+    constexpr bool operator==(const set_const_iterator rhs) const noexcept { return it == rhs.it; }
 
-    constexpr bool operator!=(const set_const_iterator rhs) const noexcept {
-      return it != rhs.it;
-    }
+    constexpr bool operator!=(const set_const_iterator rhs) const noexcept { return it != rhs.it; }
 
-    template <class, class, class> friend class set;
+    template <class, class, class>
+    friend class set;
 
   private:
-    constexpr set_const_iterator(
-        typename internal_tree_type::const_iterator i) noexcept
-        : it(i) {}
+    constexpr set_const_iterator(typename internal_tree_type::const_iterator i) noexcept : it(i) {}
 
-    constexpr set_const_iterator(internal_tree_type *tree,
-                                 avl_node           *node) noexcept
+    constexpr set_const_iterator(internal_tree_type *tree, avl_node *node) noexcept
         : it(tree, node) {}
 
     typename internal_tree_type::const_iterator it;
@@ -217,24 +203,23 @@ private:
   }
 
 public:
-  using key_type        = Key;
-  using value_type      = Key;
-  using size_type       = std::size_t;
-  using difference_type = std::ptrdiff_t;
-  using key_compare     = Compare;
-  using value_compare   = Compare;
-  using allocator_type  = Allocator;
-  using reference       = value_type &;
-  using const_reference = const value_type &;
-  using pointer         = typename std::allocator_traits<Allocator>::pointer;
-  using const_pointer =
-      typename std::allocator_traits<Allocator>::const_pointer;
+  using key_type         = Key;
+  using value_type       = Key;
+  using size_type        = std::size_t;
+  using difference_type  = std::ptrdiff_t;
+  using key_compare      = Compare;
+  using value_compare    = Compare;
+  using allocator_type   = Allocator;
+  using reference        = value_type &;
+  using const_reference  = const value_type &;
+  using pointer          = typename std::allocator_traits<Allocator>::pointer;
+  using const_pointer    = typename std::allocator_traits<Allocator>::const_pointer;
   using iterator         = set_iterator;
   using const_iterator   = set_const_iterator;
   using allocator_traits = std::allocator_traits<Allocator>;
 
-  set() noexcept(std::is_nothrow_default_constructible<
-                 compressed_pair<internal_tree_type, Allocator>>::value)
+  set() noexcept(
+      std::is_nothrow_default_constructible<compressed_pair<internal_tree_type, Allocator>>::value)
       : mValue() {}
 
   explicit set(const Allocator &alloc) noexcept(
@@ -253,13 +238,9 @@ public:
   iterator begin() noexcept { return iterator(mValue.first().begin()); }
   iterator end() noexcept { return iterator(mValue.first().end()); }
 
-  const_iterator begin() const noexcept {
-    return const_iterator(mValue.first().begin());
-  }
+  const_iterator begin() const noexcept { return const_iterator(mValue.first().begin()); }
 
-  const_iterator end() const noexcept {
-    return const_iterator(mValue.first().end());
-  }
+  const_iterator end() const noexcept { return const_iterator(mValue.first().end()); }
 
   const_iterator cbegin() const noexcept { return begin(); }
   const_iterator cend() const noexcept { return end(); }
@@ -284,10 +265,10 @@ public:
 
   bool contains(const key_type &key) const noexcept;
 
-  template <class... Args> std::pair<iterator, bool> emplace(Args &&...args);
+  template <class... Args>
+  std::pair<iterator, bool> emplace(Args &&...args);
 
-  key_compare key_comp() const
-      noexcept(std::is_nothrow_copy_constructible<key_compare>::value) {
+  key_compare key_comp() const noexcept(std::is_nothrow_copy_constructible<key_compare>::value) {
     return internal_key_comp(typename internal_compare<>::type_flag());
   }
 
@@ -310,25 +291,21 @@ void set<Key, Compare, Allocator>::clear() noexcept {
 }
 
 template <class Key, class Compare, class Allocator>
-auto set<Key, Compare, Allocator>::insert(const value_type &value)
-    -> std::pair<iterator, bool> {
+auto set<Key, Compare, Allocator>::insert(const value_type &value) -> std::pair<iterator, bool> {
   return emplace(value);
 }
 
 template <class Key, class Compare, class Allocator>
-auto set<Key, Compare, Allocator>::insert(value_type &&value)
-    -> std::pair<iterator, bool> {
+auto set<Key, Compare, Allocator>::insert(value_type &&value) -> std::pair<iterator, bool> {
   return emplace(std::move(value));
 }
 
 template <class Key, class Compare, class Allocator>
 template <class... Args>
-auto set<Key, Compare, Allocator>::emplace(Args &&...args)
-    -> std::pair<iterator, bool> {
+auto set<Key, Compare, Allocator>::emplace(Args &&...args) -> std::pair<iterator, bool> {
   node_type *node = allocator_traits::allocate(mValue.second(), 1);
   assert(node != nullptr);
-  allocator_traits::construct(mValue.second(), node,
-                              std::forward<Args>(args)...);
+  allocator_traits::construct(mValue.second(), node, std::forward<Args>(args)...);
 
   bool success = mValue.first().insert_unique(node);
   if (!success) {
@@ -373,8 +350,7 @@ auto set<Key, Compare, Allocator>::erase(const key_type &value) -> size_type {
 }
 
 template <class Key, class Compare, class Allocator>
-auto set<Key, Compare, Allocator>::count(const key_type &key) const noexcept
-    -> size_type {
+auto set<Key, Compare, Allocator>::count(const key_type &key) const noexcept -> size_type {
   const_pointer p = mValue.first().find(
       [this](const key_type &lhs, const node_type &rhs) {
         auto cmp = this->key_comp();
@@ -391,8 +367,7 @@ auto set<Key, Compare, Allocator>::count(const key_type &key) const noexcept
 }
 
 template <class Key, class Compare, class Allocator>
-auto set<Key, Compare, Allocator>::find(const key_type &key) noexcept
-    -> iterator {
+auto set<Key, Compare, Allocator>::find(const key_type &key) noexcept -> iterator {
   pointer p = mValue.first().find(
       [this](const key_type &lhs, const node_type &rhs) {
         auto cmp = this->key_comp();
@@ -412,8 +387,7 @@ auto set<Key, Compare, Allocator>::find(const key_type &key) noexcept
 }
 
 template <class Key, class Compare, class Allocator>
-auto set<Key, Compare, Allocator>::find(const key_type &key) const noexcept
-    -> const_iterator {
+auto set<Key, Compare, Allocator>::find(const key_type &key) const noexcept -> const_iterator {
   const_pointer p = mValue.first().find(
       [this](const key_type &lhs, const node_type &rhs) {
         auto cmp = this->key_comp();
@@ -433,8 +407,7 @@ auto set<Key, Compare, Allocator>::find(const key_type &key) const noexcept
 }
 
 template <class Key, class Compare, class Allocator>
-bool set<Key, Compare, Allocator>::contains(
-    const key_type &key) const noexcept {
+bool set<Key, Compare, Allocator>::contains(const key_type &key) const noexcept {
   return count(key);
 }
 
